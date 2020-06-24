@@ -9,6 +9,8 @@ from __future__ import print_function
 import numpy as np
 import cv2
 
+import codecs, json
+
 from opendr.camera import ProjectPoints
 from opendr.renderer import ColoredRenderer
 from opendr.lighting import LambertianPointLight
@@ -26,6 +28,10 @@ class SMPLRenderer(object):
                  flength=500.,
                  face_path="tf_smpl/smpl_faces.npy"):
         self.faces = np.load(face_path)
+
+        json.dump(self.faces.tolist(), codecs.open("faces.txt", 'w', encoding='utf-8'), separators=(',', ':'), sort_keys=True,
+                  indent=4)
+
         self.w = img_size
         self.h = img_size
         self.flength = flength
@@ -66,6 +72,8 @@ class SMPLRenderer(object):
         if far is None:
             far = np.maximum(np.max(verts[:, 2]) + 25, 25)
 
+
+
         imtmp = render_model(
             verts,
             self.faces,
@@ -79,6 +87,10 @@ class SMPLRenderer(object):
             color_id=color_id)
 
         return (imtmp * 255).astype('uint8')
+
+
+
+
 
     def rotated(self,
                 verts,
@@ -246,6 +258,7 @@ def get_original(proc_param, verts, cam, joints, img_size):
     flength = 500.
     tz = flength / (0.5 * img_size * cam_s)
     trans = np.hstack([cam_pos, tz])
+    # trans = np.hstack([cam_pos[0], 0, tz])
     vert_shifted = verts + trans
 
     start_pt = proc_param['start_pt'] - 0.5 * img_size

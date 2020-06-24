@@ -31,8 +31,9 @@ from src.util import image as img_util
 from src.util import openpose as op_util
 import src.config
 from src.RunModel import RunModel
+import codecs, json
 
-flags.DEFINE_string('img_path', 'data/im1963.jpg', 'Image to run')
+flags.DEFINE_string('img_path', 'data/yoga.png', 'Image to run')
 flags.DEFINE_string(
     'json_path', None,
     'If specified, uses the openpose output to crop the image.')
@@ -131,8 +132,18 @@ def main(img_path, json_path=None):
     joints, verts, cams, joints3d, theta = model.predict(
         input_img, get_theta=True)
 
+    # to_json(verts)
+
+
+
     visualize(img, proc_param, joints[0], verts[0], cams[0])
 
+# def write_verts_in_file(verts):
+#     verts.tofile('verts.txt', sep=";")
+
+def to_json(verts):
+    list_verts = verts.tolist()
+    json.dump(list_verts, codecs.open("verts.txt", 'w', encoding='utf-8'), separators=(',', ':'), sort_keys=True, indent=4)
 
 if __name__ == '__main__':
     config = flags.FLAGS
